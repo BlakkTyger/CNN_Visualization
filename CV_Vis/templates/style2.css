@@ -1,0 +1,76 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    overflow-x: hidden;
+    /*
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    */
+}
+
+h1{
+    color: white;
+    text-align: center;
+    font-family: "Courier New";
+    margin-top: 5vh;
+}
+
+.canvas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 5vh;
+}
+
+#drawingCanvas {
+    border: 1px solid rgb(34, 33, 33);
+    background-color: rgb(34, 33, 33);
+    width: 504px;
+    height: 504px;
+    image-rendering: pixelated;
+    margin-bottom: 5vh;
+    margin-top: 5vh;
+}
+
+button {
+    top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.seperator {
+    width: 100vw;
+    background-color: rgb(87, 84, 84);
+    border: none;
+    height: 3px;
+}
+
+.window-container {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+body::-webkit-scrollbar {
+    width: 12px;
+    /* width of the entire scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+    background: transparent;
+    /* color of the tracking area */
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: rgb(49, 49, 49);
+    /* color of the scroll thumb */
+    border-radius: 6px;
+    /* roundness of the scroll thumb */
+    border: 3px solid transparent;
+    /* creates padding around scroll thumb */
+}

@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CNN Babyyyyy</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+</head>
+
+<body>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            font-family: "Courier New";
+            margin-top: 5vh;
+        }
+
+        .canvas {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 5vh;
+        }
+
+        #drawingCanvas {
+            border: 1px solid rgb(34, 33, 33);
+            background-color: rgb(34, 33, 33);
+            width: 504px;
+            height: 504px;
+            image-rendering: pixelated;
+            margin-bottom: 5vh;
+            margin-top: 5vh;
+        }
+
+        button {
+            top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .seperator {
+            width: 100vw;
+            background-color: rgb(87, 84, 84);
+            border: none;
+            height: 3px;
+        }
+
+        .window-container {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+        }
+
+        body::-webkit-scrollbar {
+            width: 12px;
+            /* width of the entire scrollbar */
+        }
+
+        body::-webkit-scrollbar-track {
+            background: transparent;
+            /* color of the tracking area */
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background-color: rgb(49, 49, 49);
+            /* color of the scroll thumb */
+            border-radius: 6px;
+            /* roundness of the scroll thumb */
+            border: 3px solid transparent;
+            /* creates padding around scroll thumb */
+        }
+    </style>
+
+
+    <div class="heading">
+        <h1> CNN Animation</h1>
+    </div>
+
+    <div class="canvas">
+        <canvas id="drawingCanvas" width="28" height="28"></canvas>
+        <button id="startButton" >Register</button>
+        <br>
+        <a href = 'animation'><button>Visualize</button></a>
+    </div>
+    <script>
+        //Canvas shit
+
+        // Access the canvas element by its ID
+        const canvas = document.getElementById('drawingCanvas');
+        // Get the 2D drawing context
+        const ctx = canvas.getContext('2d');
+
+        // Variables to track the drawing state
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Function to start drawing
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX / 18, e.offsetY / 18]; // Scale down coordinates
+        }
+
+        // Function to stop drawing
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath(); // Begin a new path to prevent lines from connecting
+        }
+
+        // Function to draw
+        function draw(e) {
+            if (!isDrawing) return;
+
+            ctx.strokeStyle = 'white'; // Set the stroke color
+            ctx.lineWidth = 2; // Set the line width
+            ctx.lineJoin = 'round'; // Set the line join style
+            ctx.lineCap = 'round'; // Set the line cap style
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            [lastX, lastY] = [e.offsetX / 18, e.offsetY / 18]; // Scale down coordinates
+            ctx.lineTo(lastX, lastY);
+            ctx.stroke();
+        }
+
+        // Event listeners for mouse actions
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        /*
+        ----------------------------------------------------------------------------------------------------
+        ----------------------------------------------------------------------------------------------------
+        ----------------------------------------------------------------------------------------------------
+        */
+
+        var button = document.getElementById('startButton');
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+
+        button.addEventListener('click', function () {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var array = [];
+            for (var i = 0; i < imageData.data.length; i += 4) {
+                if ((i / 4) % 28 == 0) {
+                    array.push([]);
+                }
+                var value = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+                array[array.length - 1].push(value / 255);
+            }
+            console.log(array);
+            const jsonArray = JSON.stringify({'data':array});
+
+            fetch('process_canvas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Add CSRF token for security
+                },
+                body: jsonArray
+            })
+                .then(response => response.json())
+                .then(data => console.log('Success:', data))
+                .catch((error) => console.error('Error:', error));
+
+        });
+
+    </script>
+</body>
+
+</html>
